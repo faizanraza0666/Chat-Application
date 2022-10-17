@@ -1,24 +1,20 @@
-# import required modules
 import socket
 import threading
 import tkinter as tk
-from tkinter import scrolledtext
+from tkinter import PhotoImage, scrolledtext
 from tkinter import messagebox
 
-HOST = '127.0.0.1'
-PORT = 1234
+HOST = '0.tcp.in.ngrok.io'
+PORT = 16376
 
-DARK_GREY = '#121212'
-MEDIUM_GREY = '#1F1B24'
+DARK_GREY = '#F9D923'
+MEDIUM_GREY = '#764AF1'
 OCEAN_BLUE = '#464EB8'
-WHITE = "white"
-FONT = ("Helvetica", 17)
-BUTTON_FONT = ("Helvetica", 15)
-SMALL_FONT = ("Helvetica", 13)
+WHITE = "#764AF1"
+FONT = ("Comic Sans MS", 17)
+BUTTON_FONT = ("Georgia", 15)
+SMALL_FONT = ("Georgia", 13)
 
-# Creating a socket object
-# AF_INET: we are going to use IPv4 addresses
-# SOCK_STREAM: we are using TCP packets for communication
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 def add_message(message):
@@ -28,10 +24,7 @@ def add_message(message):
 
 def connect():
 
-    # try except block
     try:
-
-        # Connect to the server
         client.connect((HOST, PORT))
         print("Successfully connected to server")
         add_message("[SERVER] Successfully connected to the server")
@@ -49,7 +42,7 @@ def connect():
     username_textbox.config(state=tk.DISABLED)
     username_button.config(state=tk.DISABLED)
 
-def send_message():
+def send_message(event):
     message = message_textbox.get()
     if message != '':
         client.sendall(message.encode())
@@ -58,7 +51,7 @@ def send_message():
         messagebox.showerror("Empty message", "Message cannot be empty")
 
 root = tk.Tk()
-root.geometry("600x600")
+root.geometry("650x600")
 root.title("Messenger Client")
 root.resizable(False, False)
 
@@ -78,27 +71,29 @@ bottom_frame.grid(row=2, column=0, sticky=tk.NSEW)
 username_label = tk.Label(top_frame, text="Enter username:", font=FONT, bg=DARK_GREY, fg=WHITE)
 username_label.pack(side=tk.LEFT, padx=10)
 
-username_textbox = tk.Entry(top_frame, font=FONT, bg=MEDIUM_GREY, fg=WHITE, width=23)
+username_textbox = tk.Entry(top_frame, font=FONT, bg=MEDIUM_GREY, fg=DARK_GREY, width=23)
 username_textbox.pack(side=tk.LEFT)
 
-username_button = tk.Button(top_frame, text="Join", font=BUTTON_FONT, bg=OCEAN_BLUE, fg=WHITE, command=connect)
+username_button = tk.Button(top_frame, text="Join", font=BUTTON_FONT, bg=OCEAN_BLUE, fg=DARK_GREY, command=connect)
 username_button.pack(side=tk.LEFT, padx=15)
 
-message_textbox = tk.Entry(bottom_frame, font=FONT, bg=MEDIUM_GREY, fg=WHITE, width=38)
+message_textbox = tk.Entry(bottom_frame, font=FONT, bg=MEDIUM_GREY, fg=DARK_GREY, width=32)
 message_textbox.pack(side=tk.LEFT, padx=10)
 
-message_button = tk.Button(bottom_frame, text="Send", font=BUTTON_FONT, bg=OCEAN_BLUE, fg=WHITE, command=send_message)
+button_image = PhotoImage(file='download-2.png')
+message_button = tk.Button(bottom_frame, image=button_image, command=send_message)
 message_button.pack(side=tk.LEFT, padx=10)
+root.bind("<Return>", send_message)
 
-message_box = scrolledtext.ScrolledText(middle_frame, font=SMALL_FONT, bg=MEDIUM_GREY, fg=WHITE, width=67, height=26.5)
+# message_button = tk.Button(bottom_frame, text="Send", font=BUTTON_FONT, bg=OCEAN_BLUE, fg=WHITE)
+# message_button.pack(side=tk.LEFT, padx=10)
+
+message_box = scrolledtext.ScrolledText(middle_frame, font=SMALL_FONT, bg=MEDIUM_GREY, fg=DARK_GREY, width=67, height=26.5)
 message_box.config(state=tk.DISABLED)
 message_box.pack(side=tk.TOP)
 
-
 def listen_for_messages_from_server(client):
-
     while 1:
-
         message = client.recv(2048).decode('utf-8')
         if message != '':
             username = message.split("~")[0]
@@ -109,7 +104,6 @@ def listen_for_messages_from_server(client):
         else:
             messagebox.showerror("Error", "Message recevied from client is empty")
 
-# main function
 def main():
 
     root.mainloop()
